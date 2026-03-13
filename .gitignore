@@ -7,3 +7,6 @@ node_modules
 .vercel
 .deployment_report.md
 .deployment_guide.md
+.setup_supabase.sql
+.supabase_guide.md
+.supabase_guide.md  
