@@ -5,10 +5,8 @@ import router from "@routes/routes";
 
 app.use("/api", router);
 
-if(process.env.NODE_ENV !== "production") {
-    app.listen(envs.PORT, () => {
-        console.log(`Server is running on port ${envs.PORT}`);
-    });
-}
+app.listen(envs.PORT, () => {
+    console.log(`Server is running on port ${envs.PORT}`);
+});
 
 export default app;
