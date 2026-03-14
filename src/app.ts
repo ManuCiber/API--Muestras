@@ -1,6 +1,6 @@
-import app from "@server/server";
-import { envs } from "@config/envs";
-import router from "@routes/routes";
+import app from "#server/server";
+import { envs } from "#config/envs";
+import router from "#routes/routes";
 
 
 app.use("/api", router);
