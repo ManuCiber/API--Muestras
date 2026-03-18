@@ -14,6 +14,7 @@ router.get("/samples", getSamples);
 router.get("/samples/:id", validate(sampleIdSchema, 'params'), getSample);
 router.post("/samples", validate(createSampleSchema), createSample);
 router.put("/samples/:id", validate(sampleIdSchema, 'params'), validate(updateSampleSchema), updateSample);
+router.patch("/samples/:id", validate(sampleIdSchema, 'params'), validate(updateSampleSchema), updateSample);
 router.delete("/samples/:id", validate(sampleIdSchema, 'params'), deleteSample);
 
 // Visitors routes

@@ -61,4 +61,32 @@ describe('Samples API', () => {
       expect(response.body.message).toBe('Validation failed in body');
     });
   });
+
+  describe('PUT/PATCH /api/samples/:id', () => {
+    it('should update a sample with PUT', async () => {
+      const id = '550e8400-e29b-41d4-a716-446655440000';
+      const updatedSample = { nombre: 'Sample 1 Updated', existencias: 20 };
+      (prisma.muestras.update as any).mockResolvedValue({ id, ...updatedSample });
+
+      const response = await request(app)
+        .put(`/api/samples/${id}`)
+        .send(updatedSample);
+
+      expect(response.status).toBe(200);
+      expect(response.body.nombre).toBe('Sample 1 Updated');
+    });
+
+    it('should update a sample with PATCH', async () => {
+      const id = '550e8400-e29b-41d4-a716-446655440000';
+      const partialUpdate = { existencias: 30 };
+      (prisma.muestras.update as any).mockResolvedValue({ id, nombre: 'Sample 1', ...partialUpdate });
+
+      const response = await request(app)
+        .patch(`/api/samples/${id}`)
+        .send(partialUpdate);
+
+      expect(response.status).toBe(200);
+      expect(response.body.existencias).toBe(30);
+    });
+  });
 });
