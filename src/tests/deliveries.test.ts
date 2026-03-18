@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from 'supertest';
 import app from '../app';
 import { prisma } from '../lib/prisma';
@@ -17,7 +17,7 @@ vi.mock('../lib/prisma', () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
-    $transaction: vi.fn((callback) => callback(prisma)),
+    $transaction: vi.fn((callback: (arg0: any) => any) => callback(prisma)),
   },
 }));
 
@@ -29,7 +29,7 @@ describe('Deliveries API', () => {
   describe('GET /api/deliveries', () => {
     it('should return a list of deliveries', async () => {
       const mockDeliveries = [
-        { id: 1, muestras_id: 1, visitadores_id: 1, cantidad: 2 },
+        { id: '550e8400-e29b-41d4-a716-446655440004', muestra_id: '550e8400-e29b-41d4-a716-446655440000', visitador_id: '550e8400-e29b-41d4-a716-446655440002', cantidad: 2 },
       ];
       (prisma.entregas.findMany as any).mockResolvedValue(mockDeliveries);
 
@@ -42,9 +42,13 @@ describe('Deliveries API', () => {
 
   describe('POST /api/deliveries', () => {
     it('should create a new delivery and update stock', async () => {
-      const newDelivery = { muestras_id: 1, visitadores_id: 1, cantidad: 5 };
-      const mockSample = { id: 1, existencias: 10 };
-      const mockCreatedDelivery = { id: 1, ...newDelivery };
+      const newDelivery = { 
+        muestra_id: '550e8400-e29b-41d4-a716-446655440000', 
+        visitador_id: '550e8400-e29b-41d4-a716-446655440002', 
+        cantidad: 5 
+      };
+      const mockSample = { id: '550e8400-e29b-41d4-a716-446655440000', existencias: 10 };
+      const mockCreatedDelivery = { id: '550e8400-e29b-41d4-a716-446655440005', ...newDelivery };
 
       (prisma.muestras.findUnique as any).mockResolvedValue(mockSample);
       (prisma.entregas.create as any).mockResolvedValue(mockCreatedDelivery);
@@ -59,8 +63,12 @@ describe('Deliveries API', () => {
     });
 
     it('should return 400 if stock is insufficient', async () => {
-      const newDelivery = { muestras_id: 1, visitadores_id: 1, cantidad: 15 };
-      const mockSample = { id: 1, existencias: 10 };
+      const newDelivery = { 
+        muestra_id: '550e8400-e29b-41d4-a716-446655440000', 
+        visitador_id: '550e8400-e29b-41d4-a716-446655440002', 
+        cantidad: 15 
+      };
+      const mockSample = { id: '550e8400-e29b-41d4-a716-446655440000', existencias: 10 };
 
       (prisma.muestras.findUnique as any).mockResolvedValue(mockSample);
 
@@ -73,14 +81,14 @@ describe('Deliveries API', () => {
     });
 
     it('should return 400 for invalid data (zod validation)', async () => {
-        const invalidDelivery = { muestras_id: 1, cantidad: -1 }; // missing visitor_id, negative cantidad
+        const invalidDelivery = { muestra_id: 'invalid-uuid', cantidad: -1 };
   
         const response = await request(app)
           .post('/api/deliveries')
           .send(invalidDelivery);
   
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('Validation failed');
+        expect(response.body.message).toBe('Validation failed in body');
       });
   });
 });

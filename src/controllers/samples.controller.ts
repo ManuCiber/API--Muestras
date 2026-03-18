@@ -1,87 +1,31 @@
 import { Request, Response } from "express";
-import { prisma } from "lib/prisma";
+import { SamplesService } from "../services/samples.service";
+import { catchAsync } from "../utils/catch-async.util";
 
-export const getSamples = async (req: Request, res: Response) => {
-    try {
-        const samples = await prisma.muestras.findMany();
-        res.status(200).json(samples);
-        console.log(samples);
-    } catch (error) {
-        res.status(500).json({ message: "Internal server error" });
-        console.log(error);
-    }
-}
+export const getSamples = catchAsync(async (req: Request, res: Response) => {
+    const samples = await SamplesService.getAll();
+    res.status(200).json(samples);
+});
 
-export const getSample = async (req: Request, res: Response) => {
-    try {
-        const { nombre } = req.body;
-        const sample = await prisma.muestras.findFirst({
-            where: {
-                nombre: nombre
-            }
-        });
+export const getSample = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const sample = await SamplesService.getById(id as string);
+    res.status(200).json(sample);
+});
 
-        if (!sample) {
-            return res.status(404).json({ message: "Sample not found" });
-        }
+export const createSample = catchAsync(async (req: Request, res: Response) => {
+    const newSample = await SamplesService.create(req.body);
+    res.status(201).json(newSample);
+});
 
-        return res.status(200).json(sample);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
+export const updateSample = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const sample = await SamplesService.update(id as string, req.body);
+    res.status(200).json(sample);
+});
 
-export const createSample = async (req: Request, res: Response) => {
-    try {
-        const {nombre, descripcion, existencias} = req.body;
-        const newSample = await prisma.muestras.create({
-            data: {
-                nombre,
-                descripcion,
-                existencias
-            }
-        })
-        return res.status(201).json(newSample);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
-
-export const updateSample = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { nombre, descripcion, existencias } = req.body;
-        const sample = await prisma.muestras.update({
-            where: {
-                id: Number(id),
-            },
-            data: {
-                nombre,
-                descripcion,
-                existencias
-            }
-        })
-        return res.status(200).json(sample);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
-
-export const deleteSample = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const sample = await prisma.muestras.delete({
-            where: {
-                id: Number(id),
-            }
-        })
-        console.log(sample);
-        return res.status(204).json();
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
+export const deleteSample = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    await SamplesService.delete(id as string);
+    res.status(204).json();
+});

@@ -2,29 +2,19 @@
   "name": "api-muetras",
   "version": "1.0.1",
   "description": "",
-  "main": "src/app.ts",
+  "main": "src/server.ts",
   "scripts": {
     "test": "vitest run",
-    "start": "tsx src/app.ts",
-    "dev": "tsx src/app.ts",
+    "start": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
-  "imports": {
-    "#config/*": "./src/config/*.ts",
-    "#controllers/*": "./src/controllers/*.ts",
-    "#middlewares/*": "./src/middlewares/*.ts",
-    "#models/*": "./src/models/*.ts",
-    "#routes/*": "./src/routes/*.ts",
-    "#services/*": "./src/services/*.ts",
-    "#utils/*": "./src/utils/*.ts",
-    "#server/*": "./src/server/*.ts"
-  },
   "devDependencies": {
-    "@prisma/client": "^7.4.2",
+    "@prisma/client": "^7.5.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/morgan": "^1.9.10",
@@ -37,8 +27,7 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "tsx": "^4.21.0",
-    "@prisma/adapter-pg": "^7.4.2",
+    "@prisma/adapter-pg": "^7.5.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",

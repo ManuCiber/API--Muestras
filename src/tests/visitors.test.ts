@@ -24,7 +24,7 @@ describe('Visitors API', () => {
   describe('GET /api/visitors', () => {
     it('should return a list of visitors', async () => {
       const mockVisitors = [
-        { id: 1, nombre: 'John', apellido: 'Doe', zona: 'North', muestras_asignadas: 5 },
+        { id: '550e8400-e29b-41d4-a716-446655440002', nombre: 'John', zona: 'North', muestras_asignadas: 5 },
       ];
       (prisma.visitadores.findMany as any).mockResolvedValue(mockVisitors);
 
@@ -37,8 +37,8 @@ describe('Visitors API', () => {
 
   describe('POST /api/visitors', () => {
     it('should create a new visitor with valid data', async () => {
-      const newVisitor = { nombre: 'Jane', apellido: 'Smith', zona: 'South', muestras_asignadas: 10 };
-      const mockCreatedVisitor = { id: 2, ...newVisitor };
+      const newVisitor = { nombre: 'Jane', zona: 'South', muestras_asignadas: 10 };
+      const mockCreatedVisitor = { id: '550e8400-e29b-41d4-a716-446655440003', ...newVisitor };
       (prisma.visitadores.create as any).mockResolvedValue(mockCreatedVisitor);
 
       const response = await request(app)
@@ -50,14 +50,14 @@ describe('Visitors API', () => {
     });
 
     it('should return 400 for invalid data', async () => {
-      const invalidVisitor = { nombre: '', apellido: 'Smith', zona: 'South' }; // missing muestras_asignadas or empty name
+      const invalidVisitor = { nombre: '', zona: 'South' }; // missing muestras_asignadas or empty name
 
       const response = await request(app)
         .post('/api/visitors')
         .send(invalidVisitor);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toBe('Validation failed');
+      expect(response.body.message).toBe('Validation failed in body');
     });
   });
 });

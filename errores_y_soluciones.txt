@@ -1,0 +1,50 @@
+ERRORES IDENTIFICADOS Y SOLUCIONES
+
+1. Error de Importación de Prisma (SyntaxError)
+-----------------------------------------------
+Error: "The requested module '../lib/prisma' does not provide an export named 'prisma'"
+Archivos afectados:
+- src/controllers/samples.controller.ts
+- src/controllers/delivery.controller.ts
+- src/controllers/visitor.controller.ts
+
+Causa: En 'src/lib/prisma.ts' has cambiado a 'export default prisma', pero en los controladores sigues intentando importar '{ prisma }' (importación nombrada).
+
+Solución: 
+Opción A (Recomendada): Cambiar 'src/lib/prisma.ts' para usar una exportación nombrada:
+   export const prisma = new PrismaClient();
+Opción B: Cambiar las importaciones en los controladores a:
+   import prisma from "../lib/prisma";
+
+2. Error de Rutas de Módulos (ERR_MODULE_NOT_FOUND)
+--------------------------------------------------
+Error: No se encuentran los módulos al importar en 'src/routes/routes.ts'.
+Causa: Estás usando importaciones como 'from "controllers/samples.controller"', lo cual Node.js interpreta como un paquete de 'node_modules'. Faltan los prefijos de alias '@' o el camino relativo './'.
+
+Solución:
+Cambiar las importaciones para usar los alias definidos en tu tsconfig.json:
+- import * as sampleCtrl from "@controllers/samples.controller";
+- import { validate } from "@middlewares/validate.middleware";
+(Nota: Asegúrate de que el alias en tsconfig.json coincida, ej: "@controllers/*": ["./controllers/*"])
+
+3. Error de Validación de PrismaClient (Original)
+------------------------------------------------
+Error: "Using engine type 'client' requires either 'adapter' or 'accelerateUrl'"
+Causa: Al revertir los cambios en 'src/lib/prisma.ts', Prisma 7 vuelve a pedir un adaptador si se detecta que el motor debe ser tipo 'client'.
+
+Solución:
+Configurar de nuevo el adaptador en 'src/lib/prisma.ts':
+   import { PrismaClient } from "@prisma/client";
+   import { PrismaPg } from "@prisma/adapter-pg";
+   import pg from "pg";
+   import { envs } from "../config/envs";
+
+   const pool = new pg.Pool({ connectionString: envs.DATABASE_URL });
+   const adapter = new PrismaPg(pool);
+   const prisma = new PrismaClient({ adapter });
+   export { prisma };
+
+4. Configuración de TypeScript (tsconfig.json)
+----------------------------------------------
+Causa: 'module': 'ES6' puede causar problemas con las características modernas de ESM en Node.js v24.
+Solución: Cambiar a '"module": "ESNext"' o '"NodeNext"' y asegurar '"moduleResolution": "Node"' para que coincida con '"type": "module"' en package.json.

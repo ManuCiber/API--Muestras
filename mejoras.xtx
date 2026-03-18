@@ -1,0 +1,31 @@
+REPORTE DE EVALUACIÓN Y PUNTOS DE MEJORA - API-MUESTRAS
+
+Tras una evaluación exhaustiva del código fuente, la arquitectura y la suite de pruebas, se han identificado los siguientes puntos de mejora para optimizar la calidad del proyecto:
+
+1. PRUEBAS (TESTING)
+-------------------
+* Migración a Tests de Integración: Actualmente las pruebas utilizan mocks para Prisma. Se recomienda implementar tests de integración con una base de datos real (ej. usando Testcontainers o un esquema de pruebas) para validar que las queries y transacciones funcionen correctamente con el motor de base de datos.
+* Cobertura de Casos Borde: Aumentar la cobertura para casos de fallo transaccional, especialmente en el servicio de entregas donde se realizan múltiples operaciones atómicas.
+* Validación de Estado después de Error: Asegurar que los tests verifiquen que el estado de la DB no cambie cuando una operación de validación falla a mitad de camino.
+
+2. BASE DE DATOS Y PRISMA
+-------------------------
+* Convención de Nombres (Singular): Se recomienda renombrar los modelos en el esquema de Prisma a singular (`Muestra` en lugar de `Muestras`, `Visitador` en lugar de `Visitadores`). Esto es el estándar de Prisma y mejora la legibilidad del código autogenerado.
+* Tipado de la Conexión: El archivo `src/lib/prisma.ts` utiliza `pool as any`. Sería ideal resolver la discrepancia de versiones entre `@prisma/adapter-pg` y `@types/pg` para eliminar el uso de `any` y tener un tipado fuerte en la inicialización del cliente.
+
+3. REFACTORIZACIÓN DE CÓDIGO
+----------------------------
+* Eliminación de Redundancia en Controladores: En los controladores se sigue usando `Number(id)` para convertir el parámetro. Dado que el middleware de validación con Zod ya realiza esta transformación (`.transform(Number)`), se puede usar el valor tipado directamente de `req.params`.
+* Sistema de Logs Estructurado: El `errorHandler` actual usa `console.error`. Se sugiere integrar una librería de logging profesional como Winston o Pino para manejar diferentes niveles de log y facilitar la depurabilidad en entornos de producción.
+
+4. VALIDACIÓN Y LÓGICA DE NEGOCIO
+---------------------------------
+* Validaciones Lógicas Cruzadas: Si bien Zod valida tipos, algunas validaciones de negocio (como no poder entregar más unidades de las que hay en stock) podrían reforzarse con validaciones personalizadas más descriptivas antes de llegar a la capa de base de datos.
+
+5. DOCUMENTACIÓN
+----------------
+* Swagger/OpenAPI: Implementar la autogeneración de documentación con Swagger para facilitar el consumo de la API por parte del frontend y otros desarrolladores.
+
+6. ENTORNO DE DESARROLLO
+------------------------
+* Limpieza de .env: Asegurar que `.env.example` sea el único punto de referencia para variables necesarias, eliminando comentarios de versiones antiguas que puedan confundir a nuevos colaboradores.

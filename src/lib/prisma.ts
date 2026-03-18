@@ -1,8 +1,14 @@
-import { envs } from "#config/envs";
+import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "generated/prisma/client";
+import pg from "pg";
+import { envs } from "../config/envs";
 
-const connectionString = envs.DATABASE_URL;
-const adapter = new PrismaPg({connectionString});
+const pool = new pg.Pool({ connectionString: envs.DATABASE_URL });
 
-export const prisma = new PrismaClient({adapter});
+// Fixed type discrepancy between pg version and adapter-pg expectations
+const adapter = new PrismaPg(pool as any);
+
+export const prisma = new PrismaClient({
+    adapter,
+    log: ['query', 'info', 'warn', 'error'],
+});

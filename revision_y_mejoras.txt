@@ -1,0 +1,31 @@
+REVISIÓN PROFUNDA DEL PROYECTO Y PUNTOS A MEJORAR
+
+Tras analizar la estructura y el código actual del proyecto "API-Muestras", he identificado los siguientes puntos para elevar la calidad, mantenibilidad y robustez de la aplicación:
+
+1. ARQUITECTURA Y ESTRUCTURA DE CÓDIGO
+--------------------------------------
+* Capa de Servicios: Actualmente los controladores manejan la lógica de negocio y la interacción directa con Prisma. Se recomienda crear una carpeta 'src/services' para separar la lógica de base de datos de la lógica de Express (HTTP).
+* Centralización de Errores: Cada controlador tiene su propio bloque try/catch. Sería mejor implementar un "Global Error Handler" (middleware) y una clase personalizada de errores para evitar repetir `res.status(500).json(...)` en cada función.
+* Inconsistencia en Exportaciones: Algunos archivos usan 'export default' y otros 'export' nombrado. Se recomienda estandarizar a uno solo (preferiblemente nombrado para mejor soporte de autocompletado e IDE).
+
+2. BASE DE DATOS (PRISMA)
+-------------------------
+* Manejo de la Conexión: El uso de `pool as any` en `prisma.ts` es un parche temporal por un desajuste de tipos entre `@types/pg` y `@prisma/adapter-pg`. Se recomienda revisar las versiones de las dependencias para que coincidan y evitar el 'any'.
+* Scripts de Seed: No hay un archivo de semillas (seed.ts) para poblar la base de datos con datos iniciales de prueba, lo que dificulta el desarrollo en equipos.
+* Naming Conventions: En el esquema de Prisma, algunos modelos están en plural (`Muestras`, `Visitadores`) y otros en singular si se siguen estándares. Normalmente se prefiere el singular para modelos (`Muestra`, `Visitador`).
+
+3. VALIDACIÓN Y SEGURIDAD
+-------------------------
+* Validación de IDs: En los controladores se usa `Number(id)` directamente. Si `id` no es un número, Prisma fallará. Es mejor incluir la validación del parámetro `id` en los esquemas de Zod o en un middleware dedicado.
+* Sanitización de Inputs: Aunque Zod ayuda, asegúrate de que no se estén pasando campos adicionales no deseados en el `req.body` que Prisma podría intentar insertar si no se filtran explícitamente.
+* Variables de Entorno: El archivo `.env` tiene muchas líneas comentadas y versiones antiguas. Se recomienda limpiar y mantener solo las variables activas, y usar un archivo `.env.example` (sin secretos) en el repositorio.
+
+4. DESARROLLO Y DX (Developer Experience)
+-----------------------------------------
+* Alias de Rutas: Has empezado a usar `@lib`, `@config`, etc. Es excelente, pero asegúrate de que todos los archivos nuevos los usen consistentemente en lugar de rutas relativas largas (`../../`).
+* Documentación de API: Sería ideal implementar Swagger (OpenAPI) para documentar los endpoints automáticamente.
+* Pruebas (Testing): Hay archivos de test (`src/tests`), pero muchos están vacíos o fallan por problemas de alias. Se requiere configurar Vitest correctamente para que resuelva los mismos alias que `tsx`.
+
+5. RENDIMIENTO
+--------------
+* PGBouncer / Connection Pooling: Al usar Supabase, asegúrate de usar el puerto 6543 (transaction mode) si la aplicación escala, especialmente en entornos serverless o de alta concurrencia.

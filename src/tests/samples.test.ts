@@ -25,7 +25,7 @@ describe('Samples API', () => {
   describe('GET /api/samples', () => {
     it('should return a list of samples', async () => {
       const mockSamples = [
-        { id: 1, nombre: 'Sample 1', descripcion: 'Desc 1', existencias: 10 },
+        { id: '550e8400-e29b-41d4-a716-446655440000', nombre: 'Sample 1', umbral_minimo: 5, existencias: 10 },
       ];
       (prisma.muestras.findMany as any).mockResolvedValue(mockSamples);
 
@@ -38,8 +38,8 @@ describe('Samples API', () => {
 
   describe('POST /api/samples', () => {
     it('should create a new sample with valid data', async () => {
-      const newSample = { nombre: 'New Sample', descripcion: 'New Desc', existencias: 5 };
-      const mockCreatedSample = { id: 2, ...newSample };
+      const newSample = { nombre: 'New Sample', umbral_minimo: 5, existencias: 5 };
+      const mockCreatedSample = { id: '550e8400-e29b-41d4-a716-446655440001', ...newSample };
       (prisma.muestras.create as any).mockResolvedValue(mockCreatedSample);
 
       const response = await request(app)
@@ -51,14 +51,14 @@ describe('Samples API', () => {
     });
 
     it('should return 400 for invalid data', async () => {
-      const invalidSample = { nombre: '', descripcion: 'Desc', existencias: -1 };
+      const invalidSample = { nombre: '', umbral_minimo: -1, existencias: -1 };
 
       const response = await request(app)
         .post('/api/samples')
         .send(invalidSample);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toBe('Validation failed');
+      expect(response.body.message).toBe('Validation failed in body');
     });
   });
 });

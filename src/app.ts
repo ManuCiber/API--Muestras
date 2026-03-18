@@ -1,12 +1,20 @@
-import app from "#server/server";
-import { envs } from "#config/envs";
-import router from "#routes/routes";
+import express from "express";
+import morgan from "morgan";
+import cors from "cors";
+import routeApp from "@routes/routes";
+import { envs } from "@config/envs";
+import { errorHandler } from "./middleware/error.middleware";
 
 
-app.use("/api", router);
+const app = express();
 
-app.listen(envs.PORT, () => {
-    console.log(`Server is running on port ${envs.PORT}`);
-});
+app.use(cors());
+app.use(express.json());
+app.use(morgan("dev"));
+
+app.use("/api", routeApp);
+
+// Global Error Handler - Must be last
+app.use(errorHandler);
 
 export default app;

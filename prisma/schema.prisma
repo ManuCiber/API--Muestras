@@ -5,42 +5,56 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-model Muestras{
-  id Int @id @default(autoincrement())
-  nombre String
-  descripcion String
-  existencias Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  entregas Entregas[]
+
+model Muestras {
+  id             String     @id @default(uuid())
+  nombre         String
+  existencias     Int
+  umbral_minimo  Int
+  created_at     DateTime   @default(now())
+  entregas       Entregas[]
+  logs_inventario Logs_Inventario[]
 }
 
-model Visitadores{
-  id Int @id @default(autoincrement())
-  nombre String
-  apellido String
-  zona String
+model Visitadores {
+  id                 String     @id @default(uuid())
+  nombre             String
+  zona               String
   muestras_asignadas Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  entregas Entregas[]
+  created_at         DateTime   @default(now())
+  entregas           Entregas[]
 }
 
 model Entregas {
-  id Int @id @default(autoincrement())
-  muestras_id Int
-  muestra Muestras @relation(fields: [muestras_id], references: [id])
-  visitadores_id Int
-  visitador Visitadores @relation(fields: [visitadores_id], references: [id])
-  cantidad Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id               String      @id @default(uuid())
+  muestra_id       String
+  muestra          Muestras    @relation(fields: [muestra_id], references: [id])
+  visitador_id     String
+  visitador        Visitadores @relation(fields: [visitador_id], references: [id])
+  nombre_visitador String?
+  nombre_muestra   String?
+  cantidad         Int
+  fecha            DateTime    @db.Date
+  hora             DateTime    @db.Time
+  estado           String?
+  created_at       DateTime    @default(now())
+}
+
+model Logs_Inventario {
+  id              String   @id @default(uuid())
+  muestra_id      String
+  muestra         Muestras @relation(fields: [muestra_id], references: [id])
+  tipo_movimiento String
+  cantidad        Int
+  descripcion     String?
+  usuario_id      String?
+  created_at      DateTime @default(now())
 }
