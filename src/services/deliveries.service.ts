@@ -24,43 +24,63 @@ export class DeliveriesService {
   }
 
   static async create(data: { muestra_id: string; visitador_id: string; cantidad: number; fecha?: string; hora?: string; estado?: string }) {
-    const { muestra_id, cantidad, fecha, hora } = data;
+    const { muestra_id, visitador_id, cantidad, fecha, hora, estado } = data;
 
-    // Use transaction for atomic operation
-    return await prisma.$transaction(async (tx) => {
-      // 1. Check if enough stock exists
-      const sample = await tx.muestras.findUnique({
-        where: { id: muestra_id },
-      });
+    try {
+      // 1. Check if visitor exists (prevent P2003 in transaction for better error message)
+      const visitor = await prisma.visitadores.findUnique({ where: { id: visitador_id } });
+      if (!visitor) throw new AppError("Visitador not found", 404);
 
-      if (!sample || sample.existencias < cantidad) {
-        throw new AppError("Insufficient stock or sample not found", 400);
-      }
+      // Use transaction for atomic operation
+      return await prisma.$transaction(async (tx) => {
+        // 2. Check if enough stock exists
+        const sample = await tx.muestras.findUnique({
+          where: { id: muestra_id },
+        });
 
-      // 2. Prepare data with default values for fecha/hora if missing
-      const deliveryData = {
-        ...data,
-        fecha: fecha ? new Date(fecha) : new Date(),
-        hora: hora ? new Date(`1970-01-01T${hora}`) : new Date(),
-      };
+        if (!sample) throw new AppError("Sample not found", 404);
+        if (sample.existencias < cantidad) {
+          throw new AppError(`Insufficient stock. Available: ${sample.existencias}, requested: ${cantidad}`, 400);
+        }
 
-      // 3. Create the delivery
-      const delivery = await tx.entregas.create({ 
-        data: deliveryData as any 
-      });
+        // 3. Prepare data with default values for fecha/hora if missing
+        // Using UTC for consistency if no timezone is provided
+        const finalFecha = fecha ? new Date(`${fecha}T00:00:00Z`) : new Date();
+        const finalHora = hora ? new Date(`1970-01-01T${hora}:00Z`) : new Date();
 
-      // 4. Update stock
-      await tx.muestras.update({
-        where: { id: muestra_id },
-        data: {
-          existencias: {
-            decrement: cantidad,
+        // 4. Create the delivery
+        const deliveryData = {
+          muestra_id,
+          visitador_id,
+          cantidad,
+          fecha: finalFecha,
+          hora: finalHora,
+          estado: estado || "Entregado",
+          nombre_muestra: sample.nombre,
+          nombre_visitador: visitor.nombre,
+        };
+
+        const delivery = await tx.entregas.create({ 
+          data: deliveryData
+        });
+
+        // 5. Update stock
+        await tx.muestras.update({
+          where: { id: muestra_id },
+          data: {
+            existencias: {
+              decrement: cantidad,
+            },
           },
-        },
-      });
+        });
 
-      return delivery;
-    });
+        return delivery;
+      });
+    } catch (error) {
+       if (error instanceof AppError) throw error;
+       console.error("[DeliveriesService] Error creating delivery:", error);
+       throw new AppError("Failed to create delivery due to an internal error", 500);
+    }
   }
 
   static async delete(id: string) {

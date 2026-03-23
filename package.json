@@ -5,7 +5,8 @@
   "main": "src/server.ts",
   "scripts": {
     "test": "vitest run",
-    "start": "tsx src/server.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "postinstall": "prisma generate"
   },
@@ -23,6 +24,7 @@
     "@types/supertest": "^7.2.0",
     "prisma": "^7.4.2",
     "supertest": "^7.2.2",
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
