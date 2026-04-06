@@ -1,5 +1,5 @@
-import { prisma } from "@lib/prisma";
-import { AppError } from "@lib/app-error";
+import { prisma } from "../lib/prisma";
+import { AppError } from "../lib/app-error";
 
 export class DeliveriesService {
   static async getAll() {

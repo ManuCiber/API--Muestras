@@ -1,9 +1,9 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
-import routeApp from "@routes/routes";
-import { envs } from "@config/envs";
-import { errorHandler } from "./middleware/error.middleware";
+import routeApp from "../src/routes/routes";
+import { envs } from "../src/config/envs";
+import { errorHandler } from "../src/middleware/error.middleware";
 
 
 const app = express();
