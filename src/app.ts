@@ -1,7 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
-import routeApp from "./routes/routes";
+import router from "./routes/routes";
 import { errorHandler } from "../src/middleware/error.middleware";
 import { envs } from "./config/envs";
 
@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.use("/api", routeApp);
+app.use("/api", router);
 
 // Global Error Handler - Must be last
 app.use(errorHandler);
