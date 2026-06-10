@@ -1,9 +1,8 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
-import routeApp from "../src/routes/routes";
-import { errorHandler } from "../src/middleware/error.middleware";
-
+import routeApp from "../src/routes/routes.js";
+import { errorHandler } from "../src/middleware/error.middleware.js";
 
 const app = express();
 

@@ -1,6 +1,6 @@
 import morgan from "morgan";
-import app from "./app"
-import { envs } from "./config/envs";
+import app from "./app.js";
+import { envs } from "./config/envs.js";
 
 const PORT = envs.PORT;
 
