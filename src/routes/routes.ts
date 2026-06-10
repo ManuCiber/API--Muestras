@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { createSampleSchema, updateSampleSchema, idParamSchema as sampleIdSchema } from "../schemas/samples.schema";
-import { createVisitorSchema, updateVisitorSchema, idParamSchema as visitorIdSchema } from "../schemas/visitors.schema";
-import { createDeliverySchema, idParamSchema as deliveryIdSchema } from "../schemas/deliveries.schema";
+import { createSampleSchema, updateSampleSchema, idParamSchema as sampleIdSchema } from "../schemas/samples.schema.js";
+import { createVisitorSchema, updateVisitorSchema, idParamSchema as visitorIdSchema } from "../schemas/visitors.schema.js";
+import { createDeliverySchema, idParamSchema as deliveryIdSchema } from "../schemas/deliveries.schema.js";
 import { validate } from "../middleware/validate.middleware";
-import { createSample, deleteSample, getSample, getSamples, updateSample } from "../controllers/samples.controller";
-import { createVisitor, deleteVisitor, getVisitor, getVisitors, updateVisitor } from "../controllers/visitor.controller";
-import { createDelivery, deleteDelivery, getDeliveries, getDelivery, updateDelivery } from "../controllers/delivery.controller";
+import { createSample, deleteSample, getSample, getSamples, updateSample } from "../controllers/samples.controller.js";
+import { createVisitor, deleteVisitor, getVisitor, getVisitors, updateVisitor } from "../controllers/visitor.controller.js";
+import { createDelivery, deleteDelivery, getDeliveries, getDelivery, updateDelivery } from "../controllers/delivery.controller.js";
 
 const router = Router();
 
