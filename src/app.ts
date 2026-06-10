@@ -1,7 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
-import router from "./routes/routes";
+import router from "./routes/routes.js";
 import { errorHandler } from "../src/middleware/error.middleware";
 import { envs } from "./config/envs";
 
