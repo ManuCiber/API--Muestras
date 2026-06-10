@@ -4,6 +4,7 @@ import cors from "cors";
 import routeApp from "../src/routes/routes";
 import { errorHandler } from "../src/middleware/error.middleware";
 
+
 const app = express();
 
 app.use(cors());
